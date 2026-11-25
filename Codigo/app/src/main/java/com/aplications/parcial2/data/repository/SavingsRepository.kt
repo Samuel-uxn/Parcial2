@@ -1,12 +1,12 @@
 package com.aplications.planes.data.repository
 
-import com.aplications.planes.data.model.Member
-import com.aplications.planes.data.model.Payments
-import com.aplications.planes.data.model.Plan
+import com.aplications.planes.data.model.Trips
 
 interface SavingsRepository {
-    suspend fun getPlans(): Result<List<Plan>>
+    suspend fun getTrips(): Result<List<Trips>>
 
+    
+    /*
     suspend fun getPlanById(id: String): Result<Plan>
 
     suspend fun getMembers(planId: String): Result<List<Member>>
@@ -24,5 +24,7 @@ interface SavingsRepository {
     ): Result<Plan>
 
 
+
+     */
 
 }
