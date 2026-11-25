@@ -1,41 +1,36 @@
 package com.aplications.planes.data.model
 
 import com.google.gson.annotations.SerializedName
-data class Plan(
-    @SerializedName("_id") val id:String,
-    val name:String,
-    val motive: String?,
-    val targetAmount: Double,
-    val months: Int,
-)
-data class CreatePlanRequest(
-    val name:String,
-    val motive:String,
-    val targetAmount: Double,
-    val months: Int
-)
-
-data class Member(
-    @SerializedName("_id") val id:String,
+//biajes
+data class Trips(
+    @SerializedName("id") val id: String,
     val name: String,
-    val planId:String,
-    val contributionPerMonth:Double?,
-)
-data class CreateMemberRequest(
-    val name: String,
-    val planId:String,
-    val contributionPerMonth:Double,
-)
+    val destination: String,
+    val startDate: String,
+    val endDate: String,
 
-data class CreatePayRequest(
-    val planId:String,
-    val memberId: String,
-    val amount: Double
 )
-data class Payments(
-    @SerializedName("_id") val id:String,
-    val planId:String,
-    val memberId: String,
-    val amount: Double,
-    val date: String?
+data class CreateTripsRequest(
+    val name: String,
+    val destination: String,
+    val startDate: String,
+    val endDate: String
+)
+//places
+data class Places(
+    @SerializedName("id") val id: String
+)
+data class CreatePlacesRequest(
+   val tripId: String,
+    val name: String,
+    val description: String,
+    val city: String,
+    val categoryId: Int,
+    val tentativeDate: String
+)
+//categorias
+data class Categories(
+    @SerializedName("id") val id: String,
+    val name: String,
+    val description: String
 )
