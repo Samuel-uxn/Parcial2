@@ -1,5 +1,10 @@
 package com.aplications.planes.data.repository
 
+import com.aplications.planes.data.remote.ApiService
+
+class SavingsRepositoryImpl(private val api: ApiService): SavingsRepository{
+
+}
 
 /*
 class SavingsRepositoryImpl(
