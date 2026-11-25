@@ -52,4 +52,22 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+
+    //Dependencias de retrrofit
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    // Convierte el JSON a tus data class (y al revés)
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    // Imprime en Logcat las peticiones, muy útil para depurar
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    // ViewModel dentro de Compose (viewModel(), collectAsStateWithLifecycle)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+
+    // Navegar entre las 4 pantallas
+    implementation("androidx.navigation:navigation-compose:2.8.4")
+
+    // Para la prueba unitaria con corrutinas (más adelante)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+
 }
