@@ -1,0 +1,659 @@
+{
+  "schema_version": "1.0",
+  "exam_id": "gestion-viajes-android",
+  "title": "Gestión de viajes y lugares por visitar para Android",
+  "version": "1.0",
+  "description": "Evaluación de una aplicación Android para gestionar viajes y los lugares que el usuario planea visitar. La aplicación permite consultar y crear viajes, consultar su detalle, registrar lugares asociados, consultar categorías y validar la información ingresada.",
+  "statement_language": "es-CO",
+  "allowed_duration_seconds": null,
+  "allowed_ask_count": null,
+  "project_constraints": {
+    "platform": "Android",
+    "language": "Kotlin",
+    "ui_framework": "Jetpack Compose o interfaz Android equivalente",
+    "architecture": "MVVM con separación entre interfaz y lógica de negocio",
+    "backend": null,
+    "realtime_sync_required": false,
+    "authentication": {
+      "required": false
+    },
+    "team_project": false,
+    "public_repository_required": false,
+    "manual_presentation_language": "es-CO"
+  },
+  "documentation_rules": {
+    "accepted_globs": [
+      "docs/**/*.md",
+      "docs/**/*.pdf",
+      "*.md",
+      "*.pdf"
+    ]
+  },
+  "rubric_ref": "unified-android:v1",
+  "requirements": [
+    {
+      "id": "TRIP-LIST-001",
+      "type": "functional",
+      "title": "Consultar viajes registrados",
+      "description": "La aplicación muestra el listado de viajes registrados. Cada elemento del listado presenta, como mínimo, el nombre del viaje y su destino.",
+      "weight": 0.15,
+      "source": {
+        "file": "enunciado_gestion_viajes",
+        "section": "Requerimiento 1. Consultar viajes",
+        "reference": "REQ-01"
+      },
+      "acceptance_criteria": [
+        {
+          "id": "TRIP-LIST-001-AC1",
+          "description": "La aplicación presenta una pantalla o sección con el listado de viajes registrados.",
+          "verification": [
+            "ui_inspection",
+            "manual_review",
+            "source_inspection"
+          ],
+          "evidence_hints": [
+            "TripListScreen",
+            "MyTripsScreen",
+            "TripViewModel",
+            "trip list"
+          ]
+        },
+        {
+          "id": "TRIP-LIST-001-AC2",
+          "description": "Cada viaje del listado muestra su nombre y destino.",
+          "verification": [
+            "ui_inspection",
+            "source_inspection"
+          ],
+          "evidence_hints": [
+            "TripCard",
+            "TripItem",
+            "trip.name",
+            "trip.destination"
+          ]
+        },
+        {
+          "id": "TRIP-LIST-001-AC3",
+          "description": "La información mostrada corresponde a los viajes registrados en la fuente de datos utilizada por la aplicación y no únicamente a elementos estáticos de demostración.",
+          "verification": [
+            "source_inspection",
+            "manual_review"
+          ],
+          "evidence_hints": [
+            "TripRepository",
+            "TripDao",
+            "TripDataSource",
+            "repository"
+          ]
+        }
+      ],
+      "related_requirements": [
+        "TRIP-CREATE-001",
+        "TRIP-DETAIL-001"
+      ],
+      "tags": [
+        "trips",
+        "list",
+        "read"
+      ]
+    },
+    {
+      "id": "TRIP-CREATE-001",
+      "type": "functional",
+      "title": "Crear y registrar un viaje",
+      "description": "La aplicación permite registrar un viaje mediante un formulario que solicita nombre, destino, fecha de inicio y fecha de finalización.",
+      "weight": 0.2,
+      "source": {
+        "file": "enunciado_gestion_viajes",
+        "section": "Requerimiento 2. Crear viaje",
+        "reference": "REQ-02"
+      },
+      "acceptance_criteria": [
+        {
+          "id": "TRIP-CREATE-001-AC1",
+          "description": "El formulario de creación de viaje permite ingresar el nombre del viaje.",
+          "verification": [
+            "ui_inspection",
+            "source_inspection"
+          ],
+          "evidence_hints": [
+            "CreateTripScreen",
+            "TripForm",
+            "name"
+          ]
+        },
+        {
+          "id": "TRIP-CREATE-001-AC2",
+          "description": "El formulario permite ingresar el destino del viaje.",
+          "verification": [
+            "ui_inspection",
+            "source_inspection"
+          ],
+          "evidence_hints": [
+            "destination",
+            "DestinationField"
+          ]
+        },
+        {
+          "id": "TRIP-CREATE-001-AC3",
+          "description": "El formulario permite seleccionar o ingresar la fecha de inicio y la fecha de finalización.",
+          "verification": [
+            "ui_inspection",
+            "source_inspection"
+          ],
+          "evidence_hints": [
+            "DatePicker",
+            "startDate",
+            "endDate"
+          ]
+        },
+        {
+          "id": "TRIP-CREATE-001-AC4",
+          "description": "Al guardar un viaje válido, la aplicación persiste el registro y permite consultarlo posteriormente.",
+          "verification": [
+            "unit_test",
+            "manual_review",
+            "source_inspection"
+          ],
+          "evidence_hints": [
+            "saveTrip",
+            "TripRepository",
+            "TripDao",
+            "CreateTripUseCase"
+          ]
+        }
+      ],
+      "related_requirements": [
+        "TRIP-LIST-001",
+        "TRIP-DETAIL-001",
+        "TRIP-VALID-001"
+      ],
+      "tags": [
+        "trips",
+        "create",
+        "form",
+        "persistence"
+      ]
+    },
+    {
+      "id": "TRIP-DETAIL-001",
+      "type": "functional",
+      "title": "Consultar el detalle de un viaje",
+      "description": "La aplicación permite seleccionar un viaje del listado y consultar su información general y los lugares asociados a ese viaje.",
+      "weight": 0.15,
+      "source": {
+        "file": "enunciado_gestion_viajes",
+        "section": "Requerimiento 3. Consultar detalle del viaje",
+        "reference": "REQ-03"
+      },
+      "acceptance_criteria": [
+        {
+          "id": "TRIP-DETAIL-001-AC1",
+          "description": "El usuario puede seleccionar un viaje desde el listado para abrir su detalle.",
+          "verification": [
+            "ui_inspection",
+            "manual_review"
+          ],
+          "evidence_hints": [
+            "TripListScreen",
+            "navigation",
+            "TripDetailScreen"
+          ]
+        },
+        {
+          "id": "TRIP-DETAIL-001-AC2",
+          "description": "La pantalla de detalle muestra la información general del viaje, incluyendo nombre, destino y período de fechas.",
+          "verification": [
+            "ui_inspection",
+            "source_inspection"
+          ],
+          "evidence_hints": [
+            "TripDetailScreen",
+            "trip.name",
+            "destination",
+            "startDate",
+            "endDate"
+          ]
+        },
+        {
+          "id": "TRIP-DETAIL-001-AC3",
+          "description": "La pantalla de detalle muestra los lugares asociados al viaje seleccionado.",
+          "verification": [
+            "ui_inspection",
+            "source_inspection",
+            "manual_review"
+          ],
+          "evidence_hints": [
+            "PlaceList",
+            "TripPlace",
+            "places",
+            "tripId"
+          ]
+        },
+        {
+          "id": "TRIP-DETAIL-001-AC4",
+          "description": "Los lugares mostrados corresponden al viaje consultado y no se mezclan con los lugares asociados a otros viajes.",
+          "verification": [
+            "unit_test",
+            "source_inspection"
+          ],
+          "evidence_hints": [
+            "tripId",
+            "filterByTrip",
+            "PlaceRepository"
+          ]
+        }
+      ],
+      "related_requirements": [
+        "TRIP-LIST-001",
+        "PLACE-CREATE-001"
+      ],
+      "tags": [
+        "trips",
+        "detail",
+        "places",
+        "read"
+      ]
+    },
+    {
+      "id": "PLACE-CREATE-001",
+      "type": "functional",
+      "title": "Registrar lugares a visitar",
+      "description": "La aplicación permite agregar lugares a un viaje. Para cada lugar se registra nombre, descripción, ciudad, categoría y fecha tentativa de visita.",
+      "weight": 0.25,
+      "source": {
+        "file": "enunciado_gestion_viajes",
+        "section": "Requerimiento 4. Registrar lugares a visitar",
+        "reference": "REQ-04"
+      },
+      "acceptance_criteria": [
+        {
+          "id": "PLACE-CREATE-001-AC1",
+          "description": "Desde el contexto de un viaje, el usuario puede iniciar el registro de un nuevo lugar asociado a ese viaje.",
+          "verification": [
+            "ui_inspection",
+            "manual_review",
+            "source_inspection"
+          ],
+          "evidence_hints": [
+            "AddPlaceScreen",
+            "PlaceForm",
+            "tripId"
+          ]
+        },
+        {
+          "id": "PLACE-CREATE-001-AC2",
+          "description": "El formulario permite ingresar el nombre y la descripción del lugar.",
+          "verification": [
+            "ui_inspection",
+            "source_inspection"
+          ],
+          "evidence_hints": [
+            "name",
+            "description",
+            "PlaceForm"
+          ]
+        },
+        {
+          "id": "PLACE-CREATE-001-AC3",
+          "description": "El formulario permite ingresar la ciudad del lugar.",
+          "verification": [
+            "ui_inspection",
+            "source_inspection"
+          ],
+          "evidence_hints": [
+            "city",
+            "CityField"
+          ]
+        },
+        {
+          "id": "PLACE-CREATE-001-AC4",
+          "description": "El formulario permite seleccionar una categoría disponible para clasificar el lugar.",
+          "verification": [
+            "ui_inspection",
+            "source_inspection"
+          ],
+          "evidence_hints": [
+            "CategoryDropdown",
+            "CategorySelector",
+            "categoryId"
+          ]
+        },
+        {
+          "id": "PLACE-CREATE-001-AC5",
+          "description": "El formulario permite ingresar o seleccionar la fecha tentativa de visita.",
+          "verification": [
+            "ui_inspection",
+            "source_inspection"
+          ],
+          "evidence_hints": [
+            "visitDate",
+            "DatePicker"
+          ]
+        },
+        {
+          "id": "PLACE-CREATE-001-AC6",
+          "description": "Al guardar un lugar válido, este queda persistido y asociado al viaje correspondiente.",
+          "verification": [
+            "unit_test",
+            "manual_review",
+            "source_inspection"
+          ],
+          "evidence_hints": [
+            "savePlace",
+            "PlaceRepository",
+            "PlaceDao",
+            "tripId"
+          ]
+        }
+      ],
+      "related_requirements": [
+        "TRIP-DETAIL-001",
+        "CATEGORY-LIST-001",
+        "TRIP-VALID-001"
+      ],
+      "tags": [
+        "places",
+        "create",
+        "categories",
+        "persistence"
+      ]
+    },
+    {
+      "id": "CATEGORY-LIST-001",
+      "type": "functional",
+      "title": "Consultar categorías disponibles",
+      "description": "La aplicación ofrece una lista de categorías disponibles para clasificar los lugares que se agregan a un viaje.",
+      "weight": 0.1,
+      "source": {
+        "file": "enunciado_gestion_viajes",
+        "section": "Requerimiento 5. Consultar categorías",
+        "reference": "REQ-05"
+      },
+      "acceptance_criteria": [
+        {
+          "id": "CATEGORY-LIST-001-AC1",
+          "description": "La aplicación permite consultar u obtener las categorías disponibles.",
+          "verification": [
+            "source_inspection",
+            "unit_test",
+            "manual_review"
+          ],
+          "evidence_hints": [
+            "CategoryRepository",
+            "CategoryDao",
+            "CategoryViewModel",
+            "getCategories"
+          ]
+        },
+        {
+          "id": "CATEGORY-LIST-001-AC2",
+          "description": "Las categorías disponibles se presentan como opciones seleccionables en el formulario de registro de lugares.",
+          "verification": [
+            "ui_inspection",
+            "manual_review"
+          ],
+          "evidence_hints": [
+            "CategoryDropdown",
+            "DropdownMenu",
+            "CategorySelector"
+          ]
+        },
+        {
+          "id": "CATEGORY-LIST-001-AC3",
+          "description": "El lugar registrado conserva la categoría seleccionada.",
+          "verification": [
+            "unit_test",
+            "source_inspection"
+          ],
+          "evidence_hints": [
+            "categoryId",
+            "Place",
+            "selectedCategory"
+          ]
+        }
+      ],
+      "related_requirements": [
+        "PLACE-CREATE-001"
+      ],
+      "tags": [
+        "categories",
+        "catalog",
+        "read"
+      ]
+    },
+    {
+      "id": "TRIP-VALID-001",
+      "type": "functional",
+      "title": "Validar la información de viajes y lugares",
+      "description": "La aplicación valida los campos obligatorios y verifica que la fecha tentativa de visita de cada lugar se encuentre dentro del período definido para el viaje al que pertenece.",
+      "weight": 0.15,
+      "source": {
+        "file": "enunciado_gestion_viajes",
+        "section": "Requerimiento 6. Validar información",
+        "reference": "REQ-06"
+      },
+      "acceptance_criteria": [
+        {
+          "id": "TRIP-VALID-001-AC1",
+          "description": "La aplicación impide guardar un viaje cuando falta alguno de sus campos obligatorios: nombre, destino, fecha de inicio o fecha de finalización.",
+          "verification": [
+            "unit_test",
+            "ui_inspection",
+            "source_inspection"
+          ],
+          "evidence_hints": [
+            "FormValidation",
+            "validateTrip",
+            "required fields"
+          ]
+        },
+        {
+          "id": "TRIP-VALID-001-AC2",
+          "description": "La aplicación impide guardar un lugar cuando falta alguno de sus campos obligatorios: nombre, descripción, ciudad, categoría o fecha tentativa de visita.",
+          "verification": [
+            "unit_test",
+            "ui_inspection",
+            "source_inspection"
+          ],
+          "evidence_hints": [
+            "validatePlace",
+            "FormValidation",
+            "required fields"
+          ]
+        },
+        {
+          "id": "TRIP-VALID-001-AC3",
+          "description": "La fecha tentativa de visita no puede ser anterior a la fecha de inicio del viaje.",
+          "verification": [
+            "unit_test"
+          ],
+          "evidence_hints": [
+            "visitDate",
+            "startDate",
+            "date validation"
+          ]
+        },
+        {
+          "id": "TRIP-VALID-001-AC4",
+          "description": "La fecha tentativa de visita no puede ser posterior a la fecha de finalización del viaje.",
+          "verification": [
+            "unit_test"
+          ],
+          "evidence_hints": [
+            "visitDate",
+            "endDate",
+            "date validation"
+          ]
+        },
+        {
+          "id": "TRIP-VALID-001-AC5",
+          "description": "La aplicación valida que la fecha de inicio del viaje no sea posterior a la fecha de finalización.",
+          "verification": [
+            "unit_test",
+            "source_inspection"
+          ],
+          "evidence_hints": [
+            "startDate",
+            "endDate",
+            "date range validation"
+          ]
+        },
+        {
+          "id": "TRIP-VALID-001-AC6",
+          "description": "Cuando la información no es válida, la aplicación informa el error y no persiste el registro inválido.",
+          "verification": [
+            "unit_test",
+            "ui_inspection",
+            "manual_review"
+          ],
+          "evidence_hints": [
+            "validation message",
+            "error state",
+            "saveTrip",
+            "savePlace"
+          ]
+        }
+      ],
+      "related_requirements": [
+        "TRIP-CREATE-001",
+        "PLACE-CREATE-001"
+      ],
+      "tags": [
+        "validation",
+        "required-fields",
+        "dates",
+        "business-rules"
+      ]
+    },
+    {
+      "id": "TRIP-MVVM-001",
+      "type": "technical",
+      "title": "Separación de responsabilidades mediante MVVM",
+      "description": "La solución separa la interfaz, el estado de presentación y la lógica de negocio mediante responsabilidades compatibles con MVVM. La lógica de validación y las operaciones de viajes y lugares no deben estar implementadas exclusivamente dentro de los componentes visuales.",
+      "weight": 0.0,
+      "source": {
+        "file": "criterio_arquitectura_android",
+        "section": "Rúbrica global unified-android:v1",
+        "reference": "D4. Arquitectura"
+      },
+      "acceptance_criteria": [
+        {
+          "id": "TRIP-MVVM-001-AC1",
+          "description": "Se identifican responsabilidades diferenciadas para interfaz (View), ViewModel y modelo/dominio.",
+          "verification": [
+            "source_inspection",
+            "static_analysis"
+          ],
+          "evidence_hints": [
+            "Screen",
+            "ViewModel",
+            "Model",
+            "Repository",
+            "UseCase"
+          ]
+        },
+        {
+          "id": "TRIP-MVVM-001-AC2",
+          "description": "La ViewModel no mantiene referencias a componentes visuales ni contiene funciones Composable.",
+          "verification": [
+            "source_inspection",
+            "static_analysis"
+          ],
+          "evidence_hints": [
+            "ViewModel",
+            "android.view",
+            "Activity",
+            "@Composable"
+          ]
+        },
+        {
+          "id": "TRIP-MVVM-001-AC3",
+          "description": "Las reglas de validación de fechas y las operaciones principales pueden probarse sin ejecutar la interfaz gráfica.",
+          "verification": [
+            "source_inspection",
+            "unit_test"
+          ],
+          "evidence_hints": [
+            "domain",
+            "TripValidator",
+            "PlaceValidator",
+            "UseCase"
+          ]
+        }
+      ],
+      "related_requirements": [
+        "TRIP-CREATE-001",
+        "PLACE-CREATE-001",
+        "TRIP-VALID-001"
+      ],
+      "tags": [
+        "mvvm",
+        "architecture",
+        "separation-of-concerns"
+      ]
+    },
+    {
+      "id": "TRIP-TEST-001",
+      "type": "testing",
+      "title": "Pruebas unitarias de las funcionalidades principales",
+      "description": "El proyecto incluye pruebas unitarias ejecutables para verificar las operaciones de viajes, lugares, categorías y las reglas de validación definidas en el examen.",
+      "weight": 0.0,
+      "source": {
+        "file": "rubrica_global_android",
+        "section": "D2. Pruebas unitarias",
+        "reference": "unified-android:v1"
+      },
+      "acceptance_criteria": [
+        {
+          "id": "TRIP-TEST-001-AC1",
+          "description": "Existen pruebas unitarias ejecutables asociadas a las funcionalidades principales del proyecto.",
+          "verification": [
+            "unit_test",
+            "source_inspection"
+          ],
+          "evidence_hints": [
+            "src/test",
+            "JUnit",
+            "TripViewModelTest",
+            "TripRepositoryTest"
+          ]
+        },
+        {
+          "id": "TRIP-TEST-001-AC2",
+          "description": "Las pruebas cubren escenarios válidos e inválidos para los campos obligatorios y el rango de fechas de visita.",
+          "verification": [
+            "unit_test"
+          ],
+          "evidence_hints": [
+            "TripValidatorTest",
+            "PlaceValidatorTest",
+            "date range tests"
+          ]
+        },
+        {
+          "id": "TRIP-TEST-001-AC3",
+          "description": "Las pruebas pueden ejecutarse mediante Gradle y sus resultados son observables.",
+          "verification": [
+            "build",
+            "unit_test"
+          ],
+          "evidence_hints": [
+            "./gradlew test",
+            "test reports",
+            "JUnit XML"
+          ]
+        }
+      ],
+      "related_requirements": [
+        "TRIP-CREATE-001",
+        "PLACE-CREATE-001",
+        "TRIP-VALID-001"
+      ],
+      "tags": [
+        "testing",
+        "unit-tests"
+      ]
+    }
+  ]
+}
