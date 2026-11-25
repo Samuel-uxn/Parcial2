@@ -1,14 +1,7 @@
 package com.aplications.planes.data.repository
 
-import com.aplications.planes.data.model.CreateMemberRequest
-import com.aplications.planes.data.model.CreatePayRequest
-import com.aplications.planes.data.model.CreatePlanRequest
-import com.aplications.planes.data.model.Member
-import com.aplications.planes.data.model.Payments
-import com.aplications.planes.data.model.Plan
-import com.aplications.planes.data.remote.ApiService
-import retrofit2.HttpException
 
+/*
 class SavingsRepositoryImpl(
     private val api: ApiService
 ) : SavingsRepository {
@@ -83,3 +76,5 @@ class SavingsRepositoryImpl(
     }
 
 }
+
+ */
