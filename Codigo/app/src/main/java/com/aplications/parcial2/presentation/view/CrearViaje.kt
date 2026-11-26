@@ -1,102 +1,151 @@
-package com.aplications.parcial2.presentation.view
+package com.aplications.parcial2.composables
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.*
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.aplications.parcial2.data.model.Trip
+import java.util.UUID
 
 @Composable
-fun CrearViaje()
-{
-    Scaffold(containerColor = Color.White) { padding ->
-        BodyContent2(Modifier.padding(padding))
+fun CrearViaje(
+    navController: NavController,
+    viajes: MutableList<Trip>
+) {
+    Scaffold { padding ->
+        BodyCrearViaje(
+            modifier = Modifier.padding(padding),
+            navController = navController,
+            viajes = viajes
+        )
     }
 }
 
 @Composable
-fun BodyContent2(padding: Modifier) {
+fun BodyCrearViaje(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    viajes: MutableList<Trip>
+) {
+    var nombre by remember { mutableStateOf("") }
+    var destino by remember { mutableStateOf("") }
+    var fechaInicio by remember { mutableStateOf("") }
+    var fechaFin by remember { mutableStateOf("") }
+    var mensaje by remember { mutableStateOf("") }
+
     Column(
-        modifier = padding
+        modifier = modifier
             .fillMaxSize()
-            .padding(20.dp)
+            .imePadding()
     ) {
-        Text(
-            text = "Crear Viaje",
-            fontSize = 25.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Left
-        )
 
-        Spacer(modifier = Modifier.height(30.dp))
-
-
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        Text(
-            text = "Digite el Nombre del Viaje:",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-        Box(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFF0F0F0))
-                .clickable {}
-                .padding(15.dp)
+                .background(Color.Blue)
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
+            TextButton(onClick = { navController.popBackStack() }) {
+                Text("←", color = Color.White, fontSize = 24.sp)
+            }
+            Text("Crear viaje", fontSize = 24.sp, color = Color.White)
+        }
 
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(20.dp)
+        ) {
+            OutlinedTextField(
+                value = nombre,
+                onValueChange = { nombre = it },
+                label = { Text("Nombre del viaje") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
 
-                Spacer(modifier = Modifier.height(10.dp))
+            Spacer(Modifier.height(15.dp))
+
+            OutlinedTextField(
+                value = destino,
+                onValueChange = { destino = it },
+                label = { Text("Destino") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(15.dp))
+
+            Row {
+                OutlinedTextField(
+                    value = fechaInicio,
+                    onValueChange = { fechaInicio = it },
+                    label = { Text("Fecha inicio") },
+                    placeholder = { Text("AAAA-MM-DD") },
+                    singleLine = true,
+                    modifier = Modifier.weight(1f)
+                )
+
+                Spacer(Modifier.width(10.dp))
+
+                OutlinedTextField(
+                    value = fechaFin,
+                    onValueChange = { fechaFin = it },
+                    label = { Text("Fecha fin") },
+                    placeholder = { Text("AAAA-MM-DD") },
+                    singleLine = true,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            if (mensaje.isNotEmpty()) {
+                Spacer(Modifier.height(15.dp))
+                Text(mensaje, color = Color.Red)
             }
         }
 
-        Box(
+        Button(
+            onClick = {
+                if (nombre.isBlank() || destino.isBlank() ||
+                    fechaInicio.isBlank() || fechaFin.isBlank()
+                ) {
+                    mensaje = "Complete todos los campos"
+                } else {
+                    viajes.add(
+                        Trip(
+                            id = UUID.randomUUID().toString(),
+                            name = nombre.trim(),
+                            destination = destino.trim(),
+                            startDate = fechaInicio.trim(),
+                            endDate = fechaFin.trim()
+                        )
+                    )
+                    navController.popBackStack()
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFF0F0F0))
-                .clickable {}
-                .padding(15.dp)
+                .padding(20.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
         ) {
-            Column {
-
-
-                Spacer(modifier = Modifier.height(10.dp))
-            }
+            Text("Guardar")
         }
-
-
-    }
-    Button(
-        onClick = {},
-        modifier = Modifier.fillMaxWidth(),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF008C59)
-        )
-    ) {
-        Text("Crear Viaje")
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewCrearViaje()
-{
-    CrearViaje()
+fun PreviewCrearViaje() {
+    CrearViaje(
+        navController = rememberNavController(),
+        viajes = mutableListOf()
+    )
 }
-
