@@ -1,28 +1,62 @@
-package com.aplications.parcial2.composables
+package com.aplications.parcial2.presentation.view
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.aplications.parcial2.data.model.Trip
-import java.util.UUID
+import com.aplications.parcial2.AppContainer
+import com.aplications.parcial2.presentation.viewmodel.CreateTripUiState
+import com.aplications.parcial2.presentation.viewmodel.CreateTripViewModel
 
 @Composable
 fun CrearViaje(
     navController: NavController,
-    viajes: MutableList<Trip>
+    viewModel: CreateTripViewModel = viewModel(
+        factory = viewModelFactory { initializer { CreateTripViewModel(AppContainer.repository) } }
+    )
 ) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    // Cuando el viaje se guardó en el backend, volvemos a la lista
+    LaunchedEffect(state.saved) { if (state.saved) navController.popBackStack() }
+
     Scaffold { padding ->
         BodyCrearViaje(
             modifier = Modifier.padding(padding),
-            navController = navController,
-            viajes = viajes
+            state = state,
+            onNombre = viewModel::onNameChange,
+            onDestino = viewModel::onDestinationChange,
+            onFechaInicio = viewModel::onStartDateChange,
+            onFechaFin = viewModel::onEndDateChange,
+            onGuardar = viewModel::saveTrip,
+            onVolver = { navController.popBackStack() }
         )
     }
 }
@@ -30,15 +64,14 @@ fun CrearViaje(
 @Composable
 fun BodyCrearViaje(
     modifier: Modifier = Modifier,
-    navController: NavController,
-    viajes: MutableList<Trip>
+    state: CreateTripUiState,
+    onNombre: (String) -> Unit,
+    onDestino: (String) -> Unit,
+    onFechaInicio: (String) -> Unit,
+    onFechaFin: (String) -> Unit,
+    onGuardar: () -> Unit,
+    onVolver: () -> Unit
 ) {
-    var nombre by remember { mutableStateOf("") }
-    var destino by remember { mutableStateOf("") }
-    var fechaInicio by remember { mutableStateOf("") }
-    var fechaFin by remember { mutableStateOf("") }
-    var mensaje by remember { mutableStateOf("") }
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -52,7 +85,7 @@ fun BodyCrearViaje(
                 .padding(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TextButton(onClick = { navController.popBackStack() }) {
+            TextButton(onClick = onVolver) {
                 Text("←", color = Color.White, fontSize = 24.sp)
             }
             Text("Crear viaje", fontSize = 24.sp, color = Color.White)
@@ -64,79 +97,62 @@ fun BodyCrearViaje(
                 .verticalScroll(rememberScrollState())
                 .padding(20.dp)
         ) {
-            OutlinedTextField(
-                value = nombre,
-                onValueChange = { nombre = it },
-                label = { Text("Nombre del viaje") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+            CampoTexto(
+                label = "Nombre del viaje",
+                value = state.name,
+                onValueChange = onNombre,
+                error = state.errors["name"]
             )
 
             Spacer(Modifier.height(15.dp))
 
-            OutlinedTextField(
-                value = destino,
-                onValueChange = { destino = it },
-                label = { Text("Destino") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+            CampoTexto(
+                label = "Destino",
+                value = state.destination,
+                onValueChange = onDestino,
+                error = state.errors["destination"]
             )
 
             Spacer(Modifier.height(15.dp))
 
             Row {
-                OutlinedTextField(
-                    value = fechaInicio,
-                    onValueChange = { fechaInicio = it },
-                    label = { Text("Fecha inicio") },
-                    placeholder = { Text("AAAA-MM-DD") },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f)
+                CampoTexto(
+                    label = "Fecha inicio",
+                    value = state.startDate,
+                    onValueChange = onFechaInicio,
+                    modifier = Modifier.weight(1f),
+                    error = state.errors["startDate"],
+                    placeholder = "AAAA-MM-DD"
                 )
 
                 Spacer(Modifier.width(10.dp))
 
-                OutlinedTextField(
-                    value = fechaFin,
-                    onValueChange = { fechaFin = it },
-                    label = { Text("Fecha fin") },
-                    placeholder = { Text("AAAA-MM-DD") },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f)
+                CampoTexto(
+                    label = "Fecha fin",
+                    value = state.endDate,
+                    onValueChange = onFechaFin,
+                    modifier = Modifier.weight(1f),
+                    error = state.errors["endDate"],
+                    placeholder = "AAAA-MM-DD"
                 )
             }
 
-            if (mensaje.isNotEmpty()) {
+            // Error que viene del servidor o de la red
+            if (state.error != null) {
                 Spacer(Modifier.height(15.dp))
-                Text(mensaje, color = Color.Red)
+                Text(state.error, color = Color.Red)
             }
         }
 
         Button(
-            onClick = {
-                if (nombre.isBlank() || destino.isBlank() ||
-                    fechaInicio.isBlank() || fechaFin.isBlank()
-                ) {
-                    mensaje = "Complete todos los campos"
-                } else {
-                    viajes.add(
-                        Trip(
-                            id = UUID.randomUUID().toString(),
-                            name = nombre.trim(),
-                            destination = destino.trim(),
-                            startDate = fechaInicio.trim(),
-                            endDate = fechaFin.trim()
-                        )
-                    )
-                    navController.popBackStack()
-                }
-            },
+            onClick = onGuardar,
+            enabled = !state.isSaving,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(20.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
         ) {
-            Text("Guardar")
+            Text(if (state.isSaving) "Guardando..." else "Guardar")
         }
     }
 }
@@ -144,8 +160,9 @@ fun BodyCrearViaje(
 @Preview(showBackground = true)
 @Composable
 fun PreviewCrearViaje() {
-    CrearViaje(
-        navController = rememberNavController(),
-        viajes = mutableListOf()
+    BodyCrearViaje(
+        state = CreateTripUiState(),
+        onNombre = {}, onDestino = {}, onFechaInicio = {}, onFechaFin = {},
+        onGuardar = {}, onVolver = {}
     )
 }

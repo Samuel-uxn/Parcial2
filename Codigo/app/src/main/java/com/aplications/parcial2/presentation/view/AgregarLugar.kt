@@ -1,31 +1,81 @@
-package com.aplications.parcial2.composables
+package com.aplications.parcial2.presentation.view
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.aplications.parcial2.AppContainer
 import com.aplications.parcial2.data.model.Category
-import com.aplications.parcial2.data.model.Place
-import java.util.UUID
+import com.aplications.parcial2.data.model.TripDetail
+import com.aplications.parcial2.presentation.viewmodel.AddPlaceUiState
+import com.aplications.parcial2.presentation.viewmodel.AddPlaceViewModel
 
 @Composable
 fun AgregarLugar(
     navController: NavController,
     tripId: String,
-    lugares: MutableList<Place>
+    viewModel: AddPlaceViewModel = viewModel(
+        factory = viewModelFactory {
+            initializer {
+                AddPlaceViewModel(
+                    AppContainer.repository, AppContainer.repository, AppContainer.repository, tripId
+                )
+            }
+        }
+    )
 ) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    // Cuando el lugar se guardó en el backend, volvemos al detalle
+    LaunchedEffect(state.saved) { if (state.saved) navController.popBackStack() }
+
     Scaffold { padding ->
         BodyAgregarLugar(
             modifier = Modifier.padding(padding),
-            navController = navController,
-            tripId = tripId,
-            lugares = lugares
+            state = state,
+            onNombre = viewModel::onNameChange,
+            onDescripcion = viewModel::onDescriptionChange,
+            onCiudad = viewModel::onCityChange,
+            onCategoria = viewModel::onCategorySelected,
+            onFecha = viewModel::onDateChange,
+            onGuardar = viewModel::savePlace,
+            onReintentar = viewModel::load,
+            onVolver = { navController.popBackStack() }
         )
     }
 }
@@ -33,23 +83,19 @@ fun AgregarLugar(
 @Composable
 fun BodyAgregarLugar(
     modifier: Modifier = Modifier,
-    navController: NavController,
-    tripId: String,
-    lugares: MutableList<Place>
+    state: AddPlaceUiState,
+    onNombre: (String) -> Unit,
+    onDescripcion: (String) -> Unit,
+    onCiudad: (String) -> Unit,
+    onCategoria: (Int) -> Unit,
+    onFecha: (String) -> Unit,
+    onGuardar: () -> Unit,
+    onReintentar: () -> Unit,
+    onVolver: () -> Unit
 ) {
-    var nombre by remember { mutableStateOf("") }
-    var descripcion by remember { mutableStateOf("") }
-    var ciudad by remember { mutableStateOf("") }
-    var fecha by remember { mutableStateOf("") }
-    var mensaje by remember { mutableStateOf("") }
     var menu by remember { mutableStateOf(false) }
-    var categoria by remember { mutableStateOf<Category?>(null) }
-
-    val categorias = listOf(
-        Category(1, "Historico", "Lugar historico"),
-        Category(2, "Natural", "Lugar natural"),
-        Category(3, "Cultural", "Lugar cultural")
-    )
+    val categoria = state.categories.firstOrNull { it.id == state.categoryId }
+    val viaje = state.trip
 
     Column(
         modifier = modifier
@@ -64,121 +110,128 @@ fun BodyAgregarLugar(
                 .padding(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TextButton(onClick = { navController.popBackStack() }) {
+            TextButton(onClick = onVolver) {
                 Text("←", color = Color.White, fontSize = 24.sp)
             }
             Text("Agregar lugar", color = Color.White, fontSize = 24.sp)
         }
 
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-                .padding(20.dp)
-        ) {
-            OutlinedTextField(
-                value = nombre,
-                onValueChange = { nombre = it },
-                label = { Text("Nombre del lugar") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
-            )
+        if (state.isLoading) {
+            Box(
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else if (viaje == null) {
+            Column(
+                modifier = Modifier.weight(1f).fillMaxWidth().padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(state.error ?: "No se pudo cargar el viaje", color = Color.Red)
+                Spacer(Modifier.height(10.dp))
+                Button(onClick = onReintentar) { Text("Reintentar") }
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(20.dp)
+            ) {
+                Text(
+                    "Fechas del viaje: ${viaje.startDate} a ${viaje.endDate}",
+                    color = Color.Gray
+                )
 
-            Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(10.dp))
 
-            OutlinedTextField(
-                value = descripcion,
-                onValueChange = { descripcion = it },
-                label = { Text("Descripcion") },
-                modifier = Modifier.fillMaxWidth()
-            )
+                CampoTexto(
+                    label = "Nombre del lugar",
+                    value = state.name,
+                    onValueChange = onNombre,
+                    error = state.errors["name"]
+                )
 
-            Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(10.dp))
 
-            OutlinedTextField(
-                value = ciudad,
-                onValueChange = { ciudad = it },
-                label = { Text("Ciudad") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
-            )
+                CampoTexto(
+                    label = "Descripcion",
+                    value = state.description,
+                    onValueChange = onDescripcion,
+                    error = state.errors["description"],
+                    singleLine = false
+                )
 
-            Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(10.dp))
 
-            Text("Categoria")
+                CampoTexto(
+                    label = "Ciudad",
+                    value = state.city,
+                    onValueChange = onCiudad,
+                    error = state.errors["city"]
+                )
 
-            Box {
-                OutlinedButton(
-                    onClick = { menu = true },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(categoria?.name ?: "Seleccionar categoria")
-                }
+                Spacer(Modifier.height(10.dp))
 
-                DropdownMenu(
-                    expanded = menu,
-                    onDismissRequest = { menu = false }
-                ) {
-                    categorias.forEach { opcion ->
-                        DropdownMenuItem(
-                            text = { Text(opcion.name) },
-                            onClick = {
-                                categoria = opcion
-                                menu = false
-                            }
-                        )
+                Text("Categoria")
+
+                // Las categorías vienen del backend (GET /categories)
+                Box {
+                    OutlinedButton(
+                        onClick = { menu = true },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(categoria?.name ?: "Seleccionar categoria")
+                    }
+
+                    DropdownMenu(
+                        expanded = menu,
+                        onDismissRequest = { menu = false }
+                    ) {
+                        state.categories.forEach { opcion ->
+                            DropdownMenuItem(
+                                text = { Text(opcion.name) },
+                                onClick = {
+                                    onCategoria(opcion.id)
+                                    menu = false
+                                }
+                            )
+                        }
                     }
                 }
-            }
-
-            Spacer(Modifier.height(10.dp))
-
-            OutlinedTextField(
-                value = fecha,
-                onValueChange = { fecha = it },
-                label = { Text("Fecha tentativa") },
-                placeholder = { Text("AAAA-MM-DD") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            if (mensaje.isNotEmpty()) {
-                Spacer(Modifier.height(10.dp))
-                Text(mensaje, color = Color.Red)
-            }
-        }
-
-        Button(
-            onClick = {
-                val seleccionada = categoria
-
-                if (nombre.isBlank() || descripcion.isBlank() ||
-                    ciudad.isBlank() || fecha.isBlank() ||
-                    seleccionada == null
-                ) {
-                    mensaje = "Complete todos los campos"
-                } else {
-                    lugares.add(
-                        Place(
-                            id = UUID.randomUUID().toString(),
-                            tripId = tripId,
-                            name = nombre.trim(),
-                            description = descripcion.trim(),
-                            city = ciudad.trim(),
-                            categoryId = seleccionada.id,
-                            tentativeDate = fecha.trim(),
-                            category = seleccionada
-                        )
-                    )
-                    navController.popBackStack()
+                val errorCategoria = state.errors["categoryId"]
+                if (errorCategoria != null) {
+                    Text(errorCategoria, color = Color.Red, fontSize = 12.sp)
                 }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
-        ) {
-            Text("Guardar")
+
+                Spacer(Modifier.height(10.dp))
+
+                CampoTexto(
+                    label = "Fecha tentativa",
+                    value = state.tentativeDate,
+                    onValueChange = onFecha,
+                    error = state.errors["tentativeDate"],
+                    placeholder = "AAAA-MM-DD"
+                )
+
+                if (state.error != null) {
+                    Spacer(Modifier.height(10.dp))
+                    Text(state.error, color = Color.Red)
+                }
+            }
+
+            Button(
+                onClick = onGuardar,
+                enabled = !state.isSaving,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
+            ) {
+                Text(if (state.isSaving) "Guardando..." else "Guardar")
+            }
         }
     }
 }
@@ -186,9 +239,13 @@ fun BodyAgregarLugar(
 @Preview(showBackground = true)
 @Composable
 fun PreviewAgregarLugar() {
-    AgregarLugar(
-        navController = rememberNavController(),
-        tripId = "1",
-        lugares = mutableListOf()
+    BodyAgregarLugar(
+        state = AddPlaceUiState(
+            isLoading = false,
+            trip = TripDetail("1", "Playa", "Cartagena", "2026-12-01", "2026-12-10"),
+            categories = listOf(Category(1, "Histórico", ""), Category(2, "Natural", ""))
+        ),
+        onNombre = {}, onDescripcion = {}, onCiudad = {}, onCategoria = {},
+        onFecha = {}, onGuardar = {}, onReintentar = {}, onVolver = {}
     )
 }

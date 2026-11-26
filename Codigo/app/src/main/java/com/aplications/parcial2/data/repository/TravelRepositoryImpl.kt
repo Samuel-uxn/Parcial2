@@ -47,7 +47,7 @@ class TravelRepositoryImpl(
             }.getOrNull()
             Result.failure(Exception(msg ?: "Error del servidor (${e.code()})"))
         } catch (e: IOException) {
-            Result.failure(Exception("No se pudo conectar con el servidor. "))
+            Result.failure(Exception("No se pudo conectar (${e.javaClass.simpleName}: ${e.message})"))
         } catch (e: Exception) {
             Result.failure(e)
         }
