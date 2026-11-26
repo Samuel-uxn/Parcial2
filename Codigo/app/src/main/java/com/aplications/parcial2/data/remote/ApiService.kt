@@ -1,29 +1,34 @@
 package com.aplications.planes.data.remote
 
-import com.aplications.planes.data.model.Categories
-import com.aplications.planes.data.model.CreatePlacesRequest
-import com.aplications.planes.data.model.CreateTripsRequest
-import com.aplications.planes.data.model.Places
-import com.aplications.planes.data.model.Trips
+import com.aplications.parcial2.data.model.Category
+import com.aplications.parcial2.data.model.CreatePlaceRequest
+import com.aplications.parcial2.data.model.CreateTripRequest
+import com.aplications.parcial2.data.model.Place
+import com.aplications.parcial2.data.model.Trip
+import com.aplications.parcial2.data.model.TripDetail
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 
 interface ApiService{
     @GET("trips")
-    suspend fun getTrips(): List<Trips>
+    suspend fun getTrips(): List<Trip>
+
     @POST("trips")
-    suspend fun CrateTrips(@Body body: CreateTripsRequest): Trips
+    suspend fun createTrip(@Body body: CreateTripRequest): Trip
+
     @GET("trips/{id}")
-    suspend fun getTripsById(@Path("id")id: String): List<Trips>
+    suspend fun getTripDetail(@Path("id") id: String): TripDetail
+
+    @GET("places")
+    suspend fun getPlaces(@Query("tripId") tripId: String? = null): List<Place>
 
     @POST("places")
-    suspend fun CreatePlaces(@Body body: CreatePlacesRequest): Places
-    @GET("planes")
-    suspend fun getPlaces(): List<Places>
+    suspend fun createPlace(@Body body: CreatePlaceRequest): Place
 
     @GET("categories")
-    suspend fun getCategories(): List<Categories>
+    suspend fun getCategories(): List<Category>
 }

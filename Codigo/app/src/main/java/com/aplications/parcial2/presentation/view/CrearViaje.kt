@@ -22,8 +22,7 @@ fun CrearViaje()
 }
 
 @Composable
-fun BodyContent2(padding: Modifier)
-{
+fun BodyContent2(padding: Modifier) {
     Column(
         modifier = padding
             .fillMaxSize()
@@ -62,7 +61,6 @@ fun BodyContent2(padding: Modifier)
             Column {
 
 
-
                 Spacer(modifier = Modifier.height(10.dp))
             }
         }
@@ -75,7 +73,6 @@ fun BodyContent2(padding: Modifier)
                 .padding(15.dp)
         ) {
             Column {
-
 
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -93,7 +90,7 @@ fun BodyContent2(padding: Modifier)
     ) {
         Text("Crear Viaje")
     }
-
+}
 
 
 @Preview(showBackground = true)

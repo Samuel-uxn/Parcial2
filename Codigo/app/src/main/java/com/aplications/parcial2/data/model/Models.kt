@@ -1,36 +1,51 @@
-package com.aplications.planes.data.model
+package com.aplications.parcial2.data.model
 
-import com.google.gson.annotations.SerializedName
-//biajes
-data class Trips(
-    @SerializedName("id") val id: String,
+//Categories
+data class Category(
+    val id: Int,
     val name: String,
-    val destination: String,
-    val startDate: String,
-    val endDate: String,
-
+    val description: String
 )
-data class CreateTripsRequest(
+//trips
+data class Trip(
+    val id: String,
     val name: String,
     val destination: String,
     val startDate: String,
     val endDate: String
 )
-//places
-data class Places(
-    @SerializedName("id") val id: String
+data class TripDetail(
+    val id: String,
+    val name: String,
+    val destination: String,
+    val startDate: String,
+    val endDate: String,
+    val places: List<Place> = emptyList(),
+    val placesCount: Int = 0
 )
-data class CreatePlacesRequest(
-   val tripId: String,
+data class CreateTripRequest(
+    val name: String,
+    val destination: String,
+    val startDate: String,
+    val endDate: String
+)
+//ṕlaces
+data class Place(
+    val id: String,
+    val tripId: String,
+    val name: String,
+    val description: String,
+    val city: String,
+    val categoryId: Int,
+    val tentativeDate: String,
+    val category: Category? = null
+)
+data class CreatePlaceRequest(
+    val tripId: String,
     val name: String,
     val description: String,
     val city: String,
     val categoryId: Int,
     val tentativeDate: String
-)
-//categorias
-data class Categories(
-    @SerializedName("id") val id: String,
-    val name: String,
-    val description: String
-)
+)//errios
+data class ErrorBody(val message: String?)

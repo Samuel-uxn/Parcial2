@@ -1,5 +1,6 @@
-package com.aplications.planes.data.remote
+package com.aplications.parcial2.data.remote
 
+import com.aplications.planes.data.remote.ApiService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -13,5 +14,4 @@ object RetrofitClient {
             .build()
             .create(ApiService::class.java)
     }
-
 }

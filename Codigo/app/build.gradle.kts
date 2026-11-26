@@ -69,5 +69,6 @@ dependencies {
 
     // Para la prueba unitaria con corrutinas (más adelante)
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+    implementation(kotlin("test"))
 
 }
